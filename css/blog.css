@@ -1,0 +1,113 @@
+a {
+  text-decoration:none;
+}
+
+body {
+  background:AntiqueWhite;
+  color: #111;
+  font-family:Arial, sans-serif;
+  font-size:12px;
+  margin:0 auto;
+  padding:1%;
+  width:75rem;
+}
+
+h1 {
+  color:brown;
+  font-family:cursive;
+  font-size:4rem;
+  text-align:center;
+}
+
+h2 {
+  color:brown;
+  font-family:cursive;
+  font-size:3.25rem;
+  text-align:center;
+}
+
+input[type=text] {
+    width:75rem;
+    font-size:1.1rem;
+    padding:2px;
+}
+
+label {
+  display:block;
+  font-family:cursive;
+  font-size: 1.4rem;
+  margin:1rem;
+}
+
+label + label {
+    margin-top:1.8rem;
+}
+
+p {
+  padding:0.8rem 0.2rem;
+}
+
+textarea {
+  height:11rem;
+  font-size:1.2rem;
+  width:75rem;
+}
+
+.error {
+  color:red;
+}
+
+.main-title {
+    color:brown;
+    display:block;
+    font-size:inherit;
+    font-weight:bold;
+    text-align:center;
+    margin-bottom:3rem;
+    text-decoration:none;
+}
+
+.newpostheading {
+  color:brown;
+}
+
+.post + .post {
+    margin:0.2rem;
+}
+
+.post-date {
+    bottom:0;
+    color:brown;
+    margin-right:0.2rem;
+    position:absolute;
+    right:0;
+
+}
+
+.post-heading {
+    position:relative;
+    border-bottom:0.2rem solid #777;
+}
+
+.post-title {
+    font-size:1.75rem;
+    font-weight:bold;
+}
+
+.post-content {
+    margin-top:5px;
+}
+
+.submit {
+  background:brown;
+  border:2px solid white;
+  border-radius: 99%;
+  color:white;
+  display:block;
+  font-family:cursive;
+  font-size:150%;
+  margin:1rem auto;
+  padding:1.3rem;
+  text-align:center;
+}
+

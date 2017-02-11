@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Blog</title>
+    <link type="text/css" rel="stylesheet" href="/css/normalize.css">
+    <link type="text/css" rel="stylesheet" href="/css/blog.css">
+  </head>
+  <body>
+    <h1>
+      <a href="/blog" class="main-title">The Awesome Blog</a>
+    </h1>
+
+    {% block content %}
+    {% endblock %}
+    <form action='/blog/newpost'><input type='submit' value='New Entry' class='submit' /></form>
+
+  </body>
+</html>
