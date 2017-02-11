@@ -54,7 +54,7 @@ def blog_key(name = 'default'):
     return db.Key.from_path('blogs', name)
 
 
-class BlogHandler(webapp2.RequestHandler):
+class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
 
@@ -65,31 +65,31 @@ class BlogHandler(webapp2.RequestHandler):
         self.write(self.render_str(template, **kw))
 
 
-class MainPage(BlogHandler):
+class MainPage(Handler):
   def get(self):
       self.write('Hello, World!')
 
 
-class BlogFront(BlogHandler):
+class Front(Handler):
     def get(self):
         q_str = 'select * from Post order by created desc limit 5'
         posts = db.GqlQuery(q_str)
         self.render('front.html', posts = posts)
 
 
-class PostPage(BlogHandler):
-    def get(self, post_id):
-        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+class PostPage(Handler):
+    def get(self, id):
+        key = db.Key.from_path('Post', int(id), parent=blog_key())
         post = db.get(key)
 
-        if not post:
-            self.error(404)
+        if post:
+            self.render("permalink.html", post = post)
             return
 
-        self.render("permalink.html", post = post)
+        self.error(404)
 
 
-class NewPost(BlogHandler):
+class NewPost(Handler):
     def get(self):
         self.render("newpost.html")
 
@@ -107,82 +107,12 @@ class NewPost(BlogHandler):
                         error=error)
 
 
-###### Unit 2 HW's
-class Rot13(BlogHandler):
-    def get(self):
-        self.render('rot13-form.html')
 
-    def post(self):
-        rot13 = ''
-        text = self.request.get('text')
-        if text:
-            rot13 = text.encode('rot13')
+routes = webapp2.Route[
+        ('/', Front),
+        ('/blog/?', Front),
+        ('/blog/newpost', NewPost),
+        ('/blog/<id:\d+>', PostPage)
+        ]
 
-        self.render('rot13-form.html', text = rot13)
-
-
-USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
-def valid_username(username):
-    return username and USER_RE.match(username)
-
-PASS_RE = re.compile(r"^.{3,20}$")
-def valid_password(password):
-    return password and PASS_RE.match(password)
-
-EMAIL_RE  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
-def valid_email(email):
-    return not email or EMAIL_RE.match(email)
-
-class Signup(BlogHandler):
-
-    def get(self):
-        self.render("signup-form.html")
-
-    def post(self):
-        have_error = False
-        username = self.request.get('username')
-        password = self.request.get('password')
-        verify = self.request.get('verify')
-        email = self.request.get('email')
-
-        params = dict(username = username,
-                      email = email)
-
-        if not valid_username(username):
-            params['error_username'] = "That's not a valid username."
-            have_error = True
-
-        if not valid_password(password):
-            params['error_password'] = "That wasn't a valid password."
-            have_error = True
-        elif password != verify:
-            params['error_verify'] = "Your passwords didn't match."
-            have_error = True
-
-        if not valid_email(email):
-            params['error_email'] = "That's not a valid email."
-            have_error = True
-
-        if have_error:
-            self.render('signup-form.html', **params)
-        else:
-            self.redirect('/unit2/welcome?username=' + username)
-
-
-class Welcome(BlogHandler):
-    def get(self):
-        username = self.request.get('username')
-        if valid_username(username):
-            self.render('welcome.html', username = username)
-        else:
-            self.redirect('/unit2/signup')
-
-app = webapp2.WSGIApplication([('/', BlogFront),
-                               ('/unit2/rot13', Rot13),
-                               ('/unit2/signup', Signup),
-                               ('/unit2/welcome', Welcome),
-                               ('/blog/?', BlogFront),
-                               ('/blog/([0-9]+)', PostPage),
-                               ('/blog/newpost', NewPost),
-                               ],
-                              debug=True)
+app = webapp2.WSGIApplication(routes, debug=True)
