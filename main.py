@@ -51,6 +51,12 @@ def blog_key(name = 'default'):
     return db.Key.from_path('blogs', name)
 
 
+def get_posts(limit=5, offset=0):
+    q_str = 'select * from Post order by created desc limit {} offset {}'.\
+            format(limit, offset)
+    return db.GqlQuery(q_str)
+
+
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -63,23 +69,17 @@ class Handler(webapp2.RequestHandler):
 
 
 class Front(Handler):
-    def get(self):
-        q_str = 'select * from Post order by created desc limit 5'
-        posts = db.GqlQuery(q_str)
-        self.render('front.html', posts = posts)
-
-
-class PostPage(Handler):
     def get(self, *args, **kwargs):
-        key = db.Key.from_path('Post', int(kwargs['id']), parent=blog_key())
-        post = db.get(key)
-        print key, kwargs, post
-
-        if post:
-            self.render("permalink.html", post = post)
-            return
-
-        self.error(404)
+        offset = 0
+        limit = 5
+        page = 0;
+        if kwargs.has_key('page'):
+            page = kwargs['page']
+            if page.isdigit():
+                page = int(page)
+                offset = (page - 1) * limit
+        print page, limit, offset, args, kwargs
+        self.render('front.html', posts = get_posts(limit, offset))
 
 
 class NewPost(Handler):
@@ -100,8 +100,24 @@ class NewPost(Handler):
                         error=error)
 
 
+class PostPage(Handler):
+    def get(self, *args, **kwargs):
+        key = db.Key.from_path('Post', int(kwargs['id']), parent=blog_key())
+
+        post = db.get(key)
+
+        print key, kwargs, post
+
+        if post:
+            self.render("permalink.html", post = post)
+            return
+
+        self.error(404)
+
+
 app = webapp2.WSGIApplication([ ('/', Front),
+        webapp2.Route('/blog?<page:\d+>', Front),
+        webapp2.Route('/blog/<id:\d+>', PostPage),
         ('/blog', Front),
-        ('/blog/newpost', NewPost),
-        webapp2.Route('/blog/<id:\d+>', PostPage)],
+        ('/blog/newpost', NewPost)],
         debug=True)
