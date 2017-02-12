@@ -16,11 +16,8 @@
 # limitations under the License.
 #
 import os
-import re
-import cgi
 import jinja2
 import webapp2
-from string import letters
 from google.appengine.ext import db
 
 # set up jinja
@@ -65,11 +62,6 @@ class Handler(webapp2.RequestHandler):
         self.write(self.render_str(template, **kw))
 
 
-class MainPage(Handler):
-  def get(self):
-      self.write('Hello, World!')
-
-
 class Front(Handler):
     def get(self):
         q_str = 'select * from Post order by created desc limit 5'
@@ -78,9 +70,10 @@ class Front(Handler):
 
 
 class PostPage(Handler):
-    def get(self, id):
-        key = db.Key.from_path('Post', int(id), parent=blog_key())
+    def get(self, *args, **kwargs):
+        key = db.Key.from_path('Post', int(kwargs['id']), parent=blog_key())
         post = db.get(key)
+        print key, kwargs, post
 
         if post:
             self.render("permalink.html", post = post)
@@ -107,12 +100,8 @@ class NewPost(Handler):
                         error=error)
 
 
-
-routes = webapp2.Route[
-        ('/', Front),
-        ('/blog/?', Front),
+app = webapp2.WSGIApplication([ ('/', Front),
+        ('/blog', Front),
         ('/blog/newpost', NewPost),
-        ('/blog/<id:\d+>', PostPage)
-        ]
-
-app = webapp2.WSGIApplication(routes, debug=True)
+        webapp2.Route('/blog/<id:\d+>', PostPage)],
+        debug=True)
