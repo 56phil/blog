@@ -54,6 +54,8 @@ def blog_key(name = 'default'):
 def get_posts(limit=5, offset=0):
     q_str = 'select * from Post order by created desc limit {} offset {}'.\
             format(limit, offset)
+    rows = db.GqlQuery(q_str).count()
+    page_rows = db.GqlQuery(q_str).count(limit=limit, offset=offset)
     return db.GqlQuery(q_str)
 
 
@@ -69,17 +71,15 @@ class Handler(webapp2.RequestHandler):
 
 
 class Front(Handler):
-    def get(self, *args, **kwargs):
-        offset = 0
+    def get(self):
         limit = 5
-        page = 0;
-        if kwargs.has_key('page'):
-            page = kwargs['page']
-            if page.isdigit():
-                page = int(page)
-                offset = (page - 1) * limit
-        print page, limit, offset, args, kwargs
-        self.render('front.html', posts = get_posts(limit, offset))
+        offset = 0
+        page = self.request.get('page')
+        if page.isdigit():
+            page = int(page)
+            offset = (page - 1) * limit
+        posts = get_posts(limit, offset)
+        self.render('front.html', posts = posts)
 
 
 class NewPost(Handler):
@@ -100,13 +100,22 @@ class NewPost(Handler):
                         error=error)
 
 
+class Next(Handler):
+    def get(self):
+        current_page = self.request.get('page')
+        if current_page.isdigit():
+            current_page = int(current_page)
+        else:
+            current_page = 0
+        current_page += 1
+        self.redirect('/blog?page=%s' % str(current_page))
+
+
 class PostPage(Handler):
     def get(self, *args, **kwargs):
         key = db.Key.from_path('Post', int(kwargs['id']), parent=blog_key())
 
         post = db.get(key)
-
-        print key, kwargs, post
 
         if post:
             self.render("permalink.html", post = post)
@@ -115,9 +124,23 @@ class PostPage(Handler):
         self.error(404)
 
 
-app = webapp2.WSGIApplication([ ('/', Front),
-        webapp2.Route('/blog?<page:\d+>', Front),
-        webapp2.Route('/blog/<id:\d+>', PostPage),
+class Prev(Handler):
+    def get(self):
+        current_page = self.request.get('page')
+        if current_page.isdigit():
+            current_page = int(current_page)
+        else:
+            current_page = 2
+        current_page -= 1
+        self.redirect('/blog?page=%s' % str(current_page))
+
+
+app = webapp2.WSGIApplication([('/', Front),
+        webapp2.Route(r'/blog/<id:\d+>', PostPage),
         ('/blog', Front),
-        ('/blog/newpost', NewPost)],
+        ('/blog/', Front),
+        ('/blog/prev', Prev),
+        ('/blog/newpost', NewPost),
+        ('/blog/next', Next)
+        ],
         debug=True)

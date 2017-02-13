@@ -12,6 +12,10 @@ body {
   width:75rem;
 }
 
+form {
+  display:inline-block;
+}
+
 h1 {
   color:brown;
   font-family:cursive;
@@ -22,7 +26,7 @@ h1 {
 h2 {
   color:brown;
   font-family:cursive;
-  font-size:3.25rem;
+  font-size:3rem;
   text-align:center;
 }
 
@@ -53,6 +57,27 @@ textarea {
   width:75rem;
 }
 
+#bottom {
+  /* display:inline-block; */
+  /* margin:0.2rem auto; */
+  text-align:center;
+  /* width:75rem; */
+}
+
+#new {
+  top:0;
+}
+
+#next {
+  /* position:absolute; */
+  top:0;
+}
+
+#prev {
+  position:relative;
+  top:0;
+}
+
 .error {
   color:red;
 }
@@ -69,6 +94,7 @@ textarea {
 
 .newpostheading {
   color:brown;
+  text-align:center;
 }
 
 .post + .post {
@@ -77,11 +103,10 @@ textarea {
 
 .post-date {
     bottom:0;
-    color:brown;
+    color:#777;
     margin-right:0.2rem;
     position:absolute;
     right:0;
-
 }
 
 .post-heading {

@@ -12,7 +12,12 @@
 
     {% block content %}
     {% endblock %}
-    <form action='/blog/newpost'><input type='submit' value='New Entry' class='submit' /></form>
 
+    <div id='bottom'>
+      <form action='/blog/prev'><input type='submit' value='Previous Page' class='submit' id=prev /></form>
+      <form action='/blog/newpost'><input type='submit' value='New Entry' class='submit' id='new' /></form>
+      <form action='/blog/next'><input type='submit' value='Next Page' class='submit' id='next' /></form>
+    </div>
+    <input type='hidden' value='1' name='page' default='1' id='page' />
   </body>
 </html>
