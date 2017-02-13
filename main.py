@@ -56,7 +56,19 @@ def get_posts(limit=5, offset=0):
             format(limit, offset)
     rows = db.GqlQuery(q_str).count()
     page_rows = db.GqlQuery(q_str).count(limit=limit, offset=offset)
-    return db.GqlQuery(q_str)
+    result = db.GqlQuery(q_str)
+    return (result, rows, page_rows)
+
+
+def get_cookies(request):
+    cookies = {}
+    raw_cookies = request.headers.get("Cookie")
+    if raw_cookies:
+        for cookie in raw_cookies.split(";"):
+            print cookie
+            name, value = cookie.split("=")
+            cookies[name] = value
+    return cookies
 
 
 class Handler(webapp2.RequestHandler):
@@ -74,12 +86,19 @@ class Front(Handler):
     def get(self):
         limit = 5
         offset = 0
-        page = self.request.get('page')
-        if page.isdigit():
-            page = int(page)
-            offset = (page - 1) * limit
-        posts = get_posts(limit, offset)
-        self.render('front.html', posts = posts)
+        current_page = self.request.get('page')
+        if current_page.isdigit():
+            current_page = int(current_page)
+            offset = (current_page - 1) * limit
+        else:
+            page = 1
+        posts, rows, page_rows = get_posts(limit, offset)
+        last_page = rows // limit + 1
+        if rows % limit == 0:
+            last_page -= 1
+        self.response.set_cookie('page', str(current_page), path='/')
+        self.render('front.html', posts = posts, page = current_page,
+                last_page = last_page)
 
 
 class NewPost(Handler):
@@ -93,7 +112,7 @@ class NewPost(Handler):
         if subject and content:
             p = Post(parent = blog_key(), subject = subject, content = content)
             p.put()
-            self.redirect('/blog/%s' % str(p.key().id()))
+            self.redirect('/blog/{}'.format(p.key().id()))
         else:
             error = "subject and content, please!"
             self.render("newpost.html", subject=subject, content=content,
@@ -102,13 +121,13 @@ class NewPost(Handler):
 
 class Next(Handler):
     def get(self):
-        current_page = self.request.get('page')
+        cookies = get_cookies(self.request)
+        current_page = cookies.get('page')
         if current_page.isdigit():
-            current_page = int(current_page)
+            current_page = int(current_page) + 1
         else:
-            current_page = 0
-        current_page += 1
-        self.redirect('/blog?page=%s' % str(current_page))
+            current_page = 2
+        self.redirect('/blog?page={}'.format(current_page))
 
 
 class PostPage(Handler):
@@ -126,13 +145,13 @@ class PostPage(Handler):
 
 class Prev(Handler):
     def get(self):
-        current_page = self.request.get('page')
+        cookies = get_cookies(self.request)
+        current_page = cookies.get('page')
         if current_page.isdigit():
-            current_page = int(current_page)
+            current_page = int(current_page) - 1
         else:
-            current_page = 2
-        current_page -= 1
-        self.redirect('/blog?page=%s' % str(current_page))
+            current_page = 1
+        self.redirect('/blog?page={}'.format(current_page))
 
 
 app = webapp2.WSGIApplication([('/', Front),

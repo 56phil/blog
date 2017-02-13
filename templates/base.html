@@ -2,22 +2,16 @@
 <html>
   <head>
     <title>Blog</title>
-    <link type="text/css" rel="stylesheet" href="/css/normalize.css">
     <link type="text/css" rel="stylesheet" href="/css/blog.css">
   </head>
   <body>
     <h1>
-      <a href="/blog" class="main-title">The Awesome Blog</a>
+      <a href="/blog" class="main-title">That Awesome Blog</a>
     </h1>
 
     {% block content %}
     {% endblock %}
 
-    <div id='bottom'>
-      <form action='/blog/prev'><input type='submit' value='Previous Page' class='submit' id=prev /></form>
-      <form action='/blog/newpost'><input type='submit' value='New Entry' class='submit' id='new' /></form>
-      <form action='/blog/next'><input type='submit' value='Next Page' class='submit' id='next' /></form>
-    </div>
-    <input type='hidden' value='1' name='page' default='1' id='page' />
+    <input type='hidden' name='page' id='page' />
   </body>
 </html>

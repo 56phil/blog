@@ -1,4 +1,6 @@
 a {
+  color:brown;
+  font-family:cursive;
   text-decoration:none;
 }
 
@@ -9,7 +11,7 @@ body {
   font-size:12px;
   margin:0 auto;
   padding:1%;
-  width:75rem;
+  width:80rem;
 }
 
 form {
@@ -30,8 +32,15 @@ h2 {
   text-align:center;
 }
 
+html {
+  border:0;
+  margin:0;
+  padding:0;
+  width:100%;
+}
+
 input[type=text] {
-    width:75rem;
+    width:80rem;
     font-size:1.1rem;
     padding:2px;
 }
@@ -54,14 +63,11 @@ p {
 textarea {
   height:11rem;
   font-size:1.2rem;
-  width:75rem;
+  width:80rem;
 }
 
 #bottom {
-  /* display:inline-block; */
-  /* margin:0.2rem auto; */
   text-align:center;
-  /* width:75rem; */
 }
 
 #new {
@@ -69,7 +75,6 @@ textarea {
 }
 
 #next {
-  /* position:absolute; */
   top:0;
 }
 
@@ -85,7 +90,7 @@ textarea {
 .main-title {
     color:brown;
     display:block;
-    font-size:inherit;
+    font-size:4rem;
     font-weight:bold;
     text-align:center;
     margin-bottom:3rem;
@@ -115,7 +120,7 @@ textarea {
 }
 
 .post-title {
-    font-size:1.75rem;
+    font-size:1.80rem;
     font-weight:bold;
 }
 
