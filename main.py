@@ -91,7 +91,7 @@ class Front(Handler):
             current_page = int(current_page)
             offset = (current_page - 1) * limit
         else:
-            page = 1
+            current_page = 1
         posts, rows, page_rows = get_posts(limit, offset)
         last_page = rows // limit + 1
         if rows % limit == 0:
