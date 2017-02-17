@@ -67,7 +67,7 @@ def get_cookies(request):
         for cookie in raw_cookies.split(";"):
             print cookie
             name, value = cookie.split("=")
-            cookies[name] = value
+            cookies[name.strip()] = value.strip()
     return cookies
 
 
@@ -87,18 +87,20 @@ class Front(Handler):
         limit = 5
         offset = 0
         current_page = self.request.get('page')
+        print "in front: {} {}".format(current_page, type(current_page))
         if current_page.isdigit():
             current_page = int(current_page)
             offset = (current_page - 1) * limit
         else:
             current_page = 1
         posts, rows, page_rows = get_posts(limit, offset)
-        last_page = rows // limit + 1
-        if rows % limit == 0:
-            last_page -= 1
+        last_page = rows // limit
+        if rows % limit:
+            last_page += 1
         self.response.set_cookie('page', str(current_page), path='/')
         self.render('front.html', posts = posts, page = current_page,
                 last_page = last_page)
+        print current_page, last_page
 
 
 class NewPost(Handler):
@@ -122,7 +124,9 @@ class NewPost(Handler):
 class Next(Handler):
     def get(self):
         cookies = get_cookies(self.request)
+        print cookies
         current_page = cookies.get('page')
+        print "current page from cookie: {}".format(current_page)
         if current_page and current_page.isdigit():
             current_page = int(current_page) + 1
         else:
