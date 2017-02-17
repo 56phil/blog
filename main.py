@@ -123,7 +123,7 @@ class Next(Handler):
     def get(self):
         cookies = get_cookies(self.request)
         current_page = cookies.get('page')
-        if current_page.isdigit():
+        if current_page and current_page.isdigit():
             current_page = int(current_page) + 1
         else:
             current_page = 2
@@ -147,7 +147,7 @@ class Prev(Handler):
     def get(self):
         cookies = get_cookies(self.request)
         current_page = cookies.get('page')
-        if current_page.isdigit():
+        if current_page and current_page.isdigit():
             current_page = int(current_page) - 1
         else:
             current_page = 1
